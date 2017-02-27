@@ -172,6 +172,8 @@ echo "----->    and npm: `$METEOR_NPM --version`"
 # may need devDependencies (e.g. webpack) in order to build the meteor app.
 if [ -e "$APP_SOURCE_DIR"/package.json ]; then
   $METEOR_NPM install
+  echo "-----> meteor add session: Session is no longer part of the default meteor package. We need to run 'meteor add session' for it to work"
+  METEOR add session
 fi
 
 # Related to https://github.com/meteor/meteor/issues/2796 and 
