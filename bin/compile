@@ -91,6 +91,25 @@ if [ -z "$ROOT_URL" ] ; then
   exit 1
 fi
 
+# Force meteor settings or use METEOR_SETTINGS
+if [ -z "$METEOR_SETTINGS" ]; then 
+
+echo "-----> Forcing METEOR_SETTINGS to dev environment"
+# TODO: we should probably allow an override here "settings.json", $METEOR_SETTINGS_FILE
+APP_SETTINGS="$APP_SOURCE_DIR/settings.json"
+mkdir -p "$APP_CHECKOUT_DIR"/.profile.d
+cat > "$APP_CHECKOUT_DIR"/.profile.d/force-default-meteor-settings.sh <<_EOF
+#!/bin/sh
+if [ -z "\$METEOR_SETTINGS" ]; then 
+export METEOR_SETTINGS=\$(cat <<EOF
+$(cat $APP_SETTINGS)
+EOF
+)
+fi
+_EOF
+
+fi
+
 #
 # Install meteor
 #
@@ -172,6 +191,8 @@ echo "----->    and npm: `$METEOR_NPM --version`"
 # may need devDependencies (e.g. webpack) in order to build the meteor app.
 if [ -e "$APP_SOURCE_DIR"/package.json ]; then
   $METEOR_NPM install
+  echo "-----> meteor add session: Session is no longer part of the default meteor package. We need to run 'meteor add session' for it to work"
+  METEOR add session
 fi
 
 # Related to https://github.com/meteor/meteor/issues/2796 and 
